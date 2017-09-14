@@ -9,7 +9,6 @@ def index(request):
 
 def charity_list_view(request):
     charity_list = Charity.objects.all()
-    import pdb; pdb.set_trace()
     template = loader.get_template('giving/charity_list.html')
     context = Context({'charity_list': charity_list})
     output = template.render(context)
