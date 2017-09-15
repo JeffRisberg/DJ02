@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Charity(models.Model):
     name = models.CharField(max_length=31)
@@ -27,3 +28,12 @@ class Donor(models.Model):
 
     def __str__(self):
         return self.first_name + " " + self.last_name
+
+
+class Donation(models.Model):
+    donor = models.ForeignKey(User)
+    charity = models.ForeignKey(Charity)
+    amount = models.IntegerField()
+
+    def __str__(self):
+        return self.donor + " " + self.charity + " " + self.amount
