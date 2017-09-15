@@ -1,8 +1,14 @@
 from django.http.response import HttpResponse
-
 from django.template import Context, loader
 
+from django.views.decorators.csrf import csrf_exempt
+
+from django.contrib.auth import get_user
+
+from django.shortcuts import redirect, render
+
 from .models import Charity, Donor, Donation
+
 
 def index(request):
     template = loader.get_template('giving/home.html')
@@ -36,8 +42,11 @@ def donation_list_view(request):
 
 
 def new_donation_view(request):
+    user = get_user(request)
+
+    if request.method == 'POST':
+        return redirect("/giving/")
+
     charity_list = Charity.objects.all()
-    template = loader.get_template('giving/new_donation.html')
     context = Context({'charity_list': charity_list})
-    output = template.render(context)
-    return HttpResponse(output)
+    return render(request, 'giving/new_donation.html', context)
