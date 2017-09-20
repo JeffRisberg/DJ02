@@ -1,11 +1,7 @@
+from django.core.context_processors import csrf
 from django.http.response import HttpResponse
+from django.shortcuts import redirect, render_to_response
 from django.template import Context, loader
-
-from django.views.decorators.csrf import csrf_exempt
-
-from django.contrib.auth import get_user
-
-from django.shortcuts import redirect, render
 
 from .models import Charity, Donor, Donation
 
@@ -42,11 +38,18 @@ def donation_list_view(request):
 
 
 def new_donation_view(request):
-    user = get_user(request)
+    c = {}
+    c.update(csrf(request))
+    user = getattr(request, "user", None)
 
     if request.method == 'POST':
+        id = int(request.POST['charity'])
+        charity = Charity.objects.get(id__iexact=id)
+
+        donation = Donation(donor=user, amount=int(request.POST['amount']), charity=charity)
+        donation.save()
         return redirect("/giving/")
 
     charity_list = Charity.objects.all()
-    context = Context({'charity_list': charity_list})
-    return render(request, 'giving/new_donation.html', context)
+    c.update({'charity_list': charity_list})
+    return render_to_response("giving/new_donation.html", c)
